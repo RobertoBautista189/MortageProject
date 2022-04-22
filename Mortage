@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+
+
+@author: robertobautista
+"""
+ 
+class Mortgage:
+# constructor to initialize the object
+    def __init__(self, amount,apr_fixed,years):
+
+        self.amount=amount      
+        self.apr_fixed=apr_fixed
+        self.years=years
+        self.months=self.years * 12
+        self.total_paid=0
+
+    # method to calculate the monthly payment
+    def monthly_payment(self):
+
+        rate=(self.apr_fixed)/12
+        numerator=rate * ((1+ rate) ** self.months)
+        denominator=((1+rate) ** self.months)-1      
+        return self.amount*(numerator/denominator)
+
+    # method to calculate total amount paid for the entire years
+    def calculate_fx(self):
+
+        # getting monthly payment
+        amt=self.monthly_payment()
+
+        # calculating total amount paid
+        for i in range(self.years * 12):
+            self.total_paid+=amt
+
+        # calculating interest paid
+        self.total_paid-=self.amount
+
+    # method to return total amount paid including interest
+    def amount_paid(self):
+
+        return self.total_paid + self.amount
+
+    # string representation of the object
+    def __str__(self):
+
+        return "\nFixed %.1f%%" %(self.apr_fixed * 100)+"\n"+"Total Payment is $"+str(int(self.amount_paid()))
+
+# mortgage class with points
+class Mortgage_points(Mortgage):
+
+    # constructor to initialize the object
+    def __init__(self,amount,apr_fixed,years,points):
+
+        # calling the super class constructor
+        Mortgage.__init__(self,amount,apr_fixed,years)
+        self.points=points
+        self.first=0
+      
+    # calculating the total amount paid
+    def calculate_pts(self):
+
+        # calling method to calculate first payment with points
+        self.initial()
+
+        # calling method in super class to calculate total amount paid
+        Mortgage.calculate_fx(self)
+
+    # method to calculate the first payment
+    def initial(self):
+        amt=(self.points/100) * self.amount
+        self.first+=amt
+
+    # method to return total amount paid including interest
+    def amount_paid(self):
+
+        return self.first+ self.total_paid + self.amount
+
+    # string representation of the object
+    def __str__(self):
+
+        return "\nFixed %.1f%% + %.2f points" %(self.apr_fixed * 100,self.points)+"\n"+"Total Payment is $"\
+               +str(int(self.amount_paid()))
+      
+# testing
+if __name__=='__main__':
+
+    # getting input from the users
+    amountloan=int(input('Enter the total loan amount: '))
+    apr_fixed=float(input('Enter the APR for a fixed mortgage: '))
+    apr_points=float(input('Enter the APR for a mortgage by points: '))
+    points=float(input('Enter the number of points: '))
+    years=int(input('Enter the number of years: '))
+
+    # creating object
+    Morg1=Mortgage(amountloan,apr_fixed,years)
+
+    # calling the method
+    Morg1.calculate_fx()
+
+    # printing the object
+    print(Morg1)
+
+    # creating object
+    Morg2=Mortgage_points(amountloan,apr_points,years,points)
+
+    # calling the method
+    Morg2.calculate_pts()
+
+    # printing the object
+    print(Morg2)
+        
